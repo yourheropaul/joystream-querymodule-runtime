@@ -1,0 +1,15 @@
+{
+	"name": "query-helper",
+	"version": "1.0.0",
+	"main": "index.ts",
+	"license": "MIT",
+	"scripts": {
+		"build": "asc main.ts -b build/query.wasm --debug --importTable",
+		"watch": "nodemon --watch . --ext ts --exec bash -c \"yarn build\""
+	},
+	"dependencies": {
+		"assemblyscript": "github:AssemblyScript/assemblyscript",
+		"assemblyscript-json": "https://github.com/nearprotocol/assemblyscript-json#staging",
+		"nodemon": "^1.19.1"
+	}
+}
