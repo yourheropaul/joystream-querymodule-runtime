@@ -1,6 +1,12 @@
 {
   "extends": "node_modules/assemblyscript/tsconfig-base.json",
   "include": [
-    "./**/*.ts"
-  ]
+    "src/**/*.ts"
+  ],
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "paths": {
+      "joystream/*": ["lib/joystream/*"]
+    }
+  }
 }

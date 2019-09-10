@@ -4,7 +4,7 @@
 	"main": "index.ts",
 	"license": "MIT",
 	"scripts": {
-		"build": "asc main.ts -b build/query.wasm --debug --importTable",
+		"build": "asc src/reference/main.ts -b build/query.wasm --debug --importTable --lib src/lib",
 		"watch": "nodemon --watch . --ext ts --exec bash -c \"yarn build\""
 	},
 	"dependencies": {

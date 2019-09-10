@@ -1,0 +1,5 @@
+build
+apps
+*.swp
+node_modules
+yarn-error.log
