@@ -1,13 +1,14 @@
 import { glue } from "joystream/query"
-import { Category, forumCategories } from "./modules/forum"
+import { Category as CategoryType, forumCategories } from "./modules/forum"
 
-export { 
-	glue,
+export {
+    glue,
 
-	forumCategories,
+    forumCategories,
 }
 
+// tslint:disable-next-line:no-namespace
 export namespace types {
-	export const CategoryId = "u32"
-	export const Category = Category.Codec()
+    export const CategoryId = "u32"
+    export const Category = CategoryType.Codec()
 }

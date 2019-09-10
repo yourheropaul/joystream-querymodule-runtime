@@ -4,12 +4,16 @@
 	"main": "index.ts",
 	"license": "MIT",
 	"scripts": {
-		"build": "asc src/reference/main.ts -b build/query.wasm --debug --importTable --lib src/lib",
+		"lint": "tslint --project .",
+		"lintfix": "tslint --project . --fix",
+		"build": "yarn run lint || true && asc src/reference/main.ts -b build/query.wasm --debug --importTable --lib src/lib",
 		"watch": "nodemon --watch . --ext ts --exec bash -c \"yarn build\""
 	},
 	"dependencies": {
 		"assemblyscript": "github:AssemblyScript/assemblyscript",
 		"assemblyscript-json": "https://github.com/nearprotocol/assemblyscript-json#staging",
-		"nodemon": "^1.19.1"
+		"nodemon": "^1.19.1",
+		"tslint": "^5.20.0",
+		"typescript": "^3.6.2"
 	}
 }
