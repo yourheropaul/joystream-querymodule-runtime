@@ -2,6 +2,32 @@
 # yarn lockfile v1
 
 
+"@as-pect/assembly@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@as-pect/assembly/-/assembly-2.4.1.tgz#1a8fce3d0fcf48be2a693fc6fd924092fdd476d8"
+  integrity sha512-aGvOGJwJ8nQDnSLHaviOxSm+QriWY38P+4aYUxjbD02TdmnIJw+o+ce5CNpVCkKJluzoODj2zQdor0YSg7416g==
+
+"@as-pect/cli@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@as-pect/cli/-/cli-2.4.1.tgz#94429e385a84bb44dbf19bdf65af2ad5cfce90ab"
+  integrity sha512-fhJERXu7EUjFnZRS35mlWjAHFZAreHF8U5naCg2vTazPWMD0H3SdHFC2F5w4Kv+EHKBi40f0z5ToXV03KRpnUA==
+  dependencies:
+    "@as-pect/assembly" "^2.4.1"
+    "@as-pect/core" "^2.4.1"
+    chalk "^2.4.2"
+    glob "^7.1.4"
+
+"@as-pect/core@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@as-pect/core/-/core-2.4.1.tgz#b9ded82a0b3c6ed016f71151dda971b2186d8704"
+  integrity sha512-pErzXI/WopzbQo2h1u3ar7Ur/lGal6ajf+ogr5s2xbvfpEWQXtmSKCk6XEzHCtZpE/y4xBWIqDsPwNKND3mm6g==
+  dependencies:
+    "@as-pect/assembly" "^2.4.1"
+    chalk "^2.4.2"
+    long "^4.0.0"
+  optionalDependencies:
+    csv-stringify "^5.3.3"
+
 "@babel/code-frame@^7.0.0":
   version "7.5.5"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.5.5.tgz#bc0782f6d69f7b7d49531219699b988f669a8f9d"
@@ -104,9 +130,9 @@ array-unique@^0.3.2:
   version "0.1.0-preview1"
   resolved "https://github.com/nearprotocol/assemblyscript-json#ef54d6f227585cbee70d0df7abba9144c020e7ab"
 
-"assemblyscript@github:AssemblyScript/assemblyscript":
+assemblyscript@assemblyscript/assemblyscript:
   version "0.7.0"
-  resolved "https://codeload.github.com/AssemblyScript/assemblyscript/tar.gz/b4799500f1a1d8fc08e86abdc7535cc1abf78884"
+  resolved "https://codeload.github.com/assemblyscript/assemblyscript/tar.gz/09f0f174e1da2904b53dfd104fef031f5941b5c9"
   dependencies:
     "@protobufjs/utf8" "^1.1.0"
     binaryen "87.0.0-nightly.20190716"
@@ -230,7 +256,7 @@ capture-stack-trace@^1.0.0:
   resolved "https://registry.yarnpkg.com/capture-stack-trace/-/capture-stack-trace-1.0.1.tgz#a6c0bbe1f38f3aa0b92238ecb6ff42c344d4135d"
   integrity sha512-mYQLZnx5Qt1JgB1WEiMCf2647plpGeQ2NMR/5L0HNZzGQo4fuSPnK+wjfPnKZV0aiJDgzmWqqkV/g7JD+DW0qw==
 
-chalk@^2.0.0, chalk@^2.0.1, chalk@^2.3.0:
+chalk@^2.0.0, chalk@^2.0.1, chalk@^2.3.0, chalk@^2.4.2:
   version "2.4.2"
   resolved "https://registry.yarnpkg.com/chalk/-/chalk-2.4.2.tgz#cd42541677a54333cf541a49108c1432b44c9424"
   integrity sha512-Mti+f9lpJNcwF4tWV8/OrTTtF1gZi+f8FqlyAdouralcFWFQWF2+NgCHShjkCb+IFBLq9buZwE1xckQU4peSuQ==
@@ -370,6 +396,11 @@ crypto-random-string@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/crypto-random-string/-/crypto-random-string-1.0.0.tgz#a230f64f568310e1498009940790ec99545bca7e"
   integrity sha1-ojD2T1aDEOFJgAmUB5DsmVRbyn4=
+
+csv-stringify@^5.3.3:
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/csv-stringify/-/csv-stringify-5.3.3.tgz#c4725686a33db9f61e70d87af712285baefebe21"
+  integrity sha512-q8Qj+/lN74LRmG7Mg0LauE5WcnJOD5MEGe1gI57IYJCB61KWuEbAFHm1uIPDkI26aqElyBB57SlE2GGwq2EY5A==
 
 debug@^2.2.0, debug@^2.3.3:
   version "2.6.9"
