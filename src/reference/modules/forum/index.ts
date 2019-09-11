@@ -20,11 +20,15 @@ export class CategoryList extends Resolver {
 
     public resolve(p: Params): void {
         NextCategoryId.fetch((nextId: CategoryId) => {
+            const batch = CategoryById.batch()
+
             for (let i: CategoryId = 1; i < nextId; i++) {
-                CategoryById.fetch(i, (category: Category) => {
-                    produce.json(category.JSON)
-                })
+                batch.add(i)
             }
+
+            batch.fetch((category: Category) => {
+                produce.json(category.JSON)
+            })
         })
     }
 }

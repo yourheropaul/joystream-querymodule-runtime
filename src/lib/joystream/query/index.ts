@@ -197,6 +197,14 @@ declare namespace api {
                                   arg: K,
                                   callback0: nestedCallback<T>,
                                   callback1: callback<T> ): JSON
+
+    @external("api", "callWithArgNumberWrapperBatch")
+    function callArgWrapperBatch<T, K>(module: string,
+                                       storage: string,
+                                       arg: K[],
+                                       callback0: nestedCallback<T>,
+                                       callback1: callback<T> ): JSON
+
 }
 
 declare namespace response {
