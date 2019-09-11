@@ -6,7 +6,7 @@
 	"scripts": {
 		"lint": "tslint --project .",
 		"lintfix": "tslint --project . --fix",
-		"build": "yarn run asp && yarn run lint || true && asc src/reference/main.ts -b build/query.wasm --debug --importTable --lib src/lib",
+		"build": "yarn run asp && asc src/reference/main.ts -b build/query.wasm --debug --importTable --lib src/lib",
 		"watch": "nodemon --watch . --ext ts --exec bash -c \"yarn build\""
 	},
 	"dependencies": {

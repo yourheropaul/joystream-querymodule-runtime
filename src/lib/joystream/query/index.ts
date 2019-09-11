@@ -88,9 +88,21 @@ export namespace glue {
         return new JSON(kind, value)
     }
 
-    export const ID_STRINGJSONMAP = idof<TypedMapEntry<string, JSON>>()
-    export const SIZE_STRINGJSONMAP = offsetof<TypedMapEntry<string, JSON>>()
-    export const ID_ARRAYSTRINGJSONMAP = idof<Array<TypedMapEntry<string, JSON>>>()
+    export function ResolverSDLType(r: Resolver): string {
+        return r.SDLType
+    }
+
+    export function ResolveQuery(w: ResolverWrapper): void {
+        w.resolve(new TypedMap<string, JSON>()) // FIXME! Accept params
+    }
+
+    export function ResolverType(w: ResolverWrapper): string {
+        return w.returnType()
+    }
+
+    export function ResolverParams(w: ResolverWrapper): string[] {
+        return w.params()
+    }
 }
 
 export class JSON {
@@ -233,3 +245,65 @@ export namespace produce {
 }
 
 export { console, api, response }
+
+export type Params = TypedMap<string, JSON>
+export type ResolverFunc = (p: Params) => void
+export type StringFunc = () => string
+export type StringArrayFunc = () => string[]
+
+export class Resolver {
+    public params: string[]
+    public SDLType: string
+
+    constructor(params: string[], SDLType: string) {
+        this.params = params
+        this.SDLType = SDLType
+    }
+
+    public resolve(p: Params): void {}
+}
+
+// ResolverWrapper uses some gymnastics to get around the lack of interfaces.
+// Instead of accepting a generic type, it accepts callback functions that
+// simulate getting the values from a generic type.
+export class ResolverWrapper {
+    public resolveFunc: ResolverFunc
+    public returnTypeFunc: StringFunc
+    public filtersFunc: StringArrayFunc
+
+    constructor(resolveFn: ResolverFunc, returnFn: StringFunc, filtersFn: StringArrayFunc) {
+        this.resolveFunc = resolveFn
+        this.returnTypeFunc = returnFn
+        this.filtersFunc = filtersFn
+    }
+
+    // TODO! Add return type and params callbacks!
+    public resolve(p: Params): void {
+        this.resolveFunc(p)
+    }
+
+    public returnType(): string {
+        return this.returnTypeFunc()
+    }
+
+    public params(): string[] {
+        return this.filtersFunc()
+    }
+}
+
+export function DeclareResolver<T extends Resolver>(): ResolverWrapper  {
+    return new ResolverWrapper(
+        (p: Params) => {
+            const obj = instantiate<T>()
+            obj.resolve(p)
+        },
+        (): string => {
+            const obj = instantiate<T>()
+            return obj.SDLType
+        },
+        (): string[] => {
+            const obj = instantiate<T>()
+            return obj.params
+        },
+    )
+}

@@ -1,4 +1,4 @@
-import { produce } from "joystream/query"
+import { Params, produce, Resolver } from "joystream/query"
 import { Struct } from "joystream/query/codec"
 import { Map, Plain } from "joystream/query/storage"
 
@@ -13,12 +13,18 @@ export class Category extends Struct {
 export const NextCategoryId = new Plain<CategoryId>("forum", "nextCategoryId")
 export const CategoryById = new Map<CategoryId, Category>("forum", "CategoryById")
 
-export function forumCategories(): void {
-    NextCategoryId.fetch((nextId: CategoryId) => {
-        for (let i: CategoryId = 1; i < nextId; i++) {
-            CategoryById.fetch(i, (category: Category) => {
-                produce.json(category.JSON)
-            })
-        }
-    })
+export class CategoryList extends Resolver {
+    constructor() {
+        super(["A"], "[Category]")
+    }
+
+    public resolve(p: Params): void {
+        NextCategoryId.fetch((nextId: CategoryId) => {
+            for (let i: CategoryId = 1; i < nextId; i++) {
+                CategoryById.fetch(i, (category: Category) => {
+                    produce.json(category.JSON)
+                })
+            }
+        })
+    }
 }
