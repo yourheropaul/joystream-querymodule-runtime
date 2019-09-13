@@ -92,8 +92,15 @@ export namespace glue {
         return r.SDLType
     }
 
-    export function ResolveQuery(w: ResolverWrapper): void {
-        w.resolve(new TypedMap<string, JSON>()) // FIXME! Accept params
+    export function NewContext(params: Params): Context {
+        const c = new Context()
+        c.id = changetype<u32>(c)
+        c.params = params
+        return c
+    }
+
+    export function ResolveQuery(w: ResolverWrapper, c: Context): void {
+        w.resolve(c)
     }
 
     export function ResolverType(w: ResolverWrapper): string {
@@ -172,34 +179,39 @@ declare namespace console {
 }
 
 declare namespace api {
-    type callback<T = JSON> = (j: T) => void
-    type nestedCallback<T = JSON> = (j: JSON, callback: callback<T>) => void
+    type callback<T = JSON> = (c: Context, j: T) => void
+    type nestedCallback<T = JSON> = (c: Context, j: JSON, callback: callback<T>) => void
 
     @external("api", "call")
-    function call(module: string,
+    function call(ctx: Context,
+                  module: string,
                   storage: string,
                   callback: callback): JSON
 
     @external("api", "callWithArgNumber")
-    function callArg<T>(module: string,
+    function callArg<T>(ctx: Context,
+                        module: string,
                         storage: string,
                         arg: T, callback: callback): JSON
 
     @external("api", "callWrapper")
-    function callWrapper<T>(module: string,
+    function callWrapper<T>(ctx: Context,
+                            module: string,
                             storage: string,
                             callback0: nestedCallback<T>,
                             callback1: callback<T>): JSON
 
     @external("api", "callWithArgNumberWrapper")
-    function callArgWrapper<T, K>(module: string,
+    function callArgWrapper<T, K>(ctx: Context,
+                                  module: string,
                                   storage: string,
                                   arg: K,
                                   callback0: nestedCallback<T>,
                                   callback1: callback<T> ): JSON
 
     @external("api", "callWithArgNumberWrapperBatch")
-    function callArgWrapperBatch<T, K>(module: string,
+    function callArgWrapperBatch<T, K>(ctx: Context,
+                                       module: string,
                                        storage: string,
                                        arg: K[],
                                        callback0: nestedCallback<T>,
@@ -255,9 +267,19 @@ export namespace produce {
 export { console, api, response }
 
 export type Params = TypedMap<string, JSON>
-export type ResolverFunc = (p: Params) => void
+export type ResolverFunc = (ctx: Context) => void
 export type StringFunc = () => string
 export type StringArrayFunc = () => string[]
+
+export class Context {
+    id: u32
+    params: Params
+    ptr: u32
+
+    as<T>(): T {
+        return changetype<T>(this.ptr)
+    }
+}
 
 export class Resolver {
     public params: string[]
@@ -268,7 +290,7 @@ export class Resolver {
         this.SDLType = SDLType
     }
 
-    public resolve(p: Params): void {}
+    public resolve(ctx: Context): void {}
 }
 
 // ResolverWrapper uses some gymnastics to get around the lack of interfaces.
@@ -286,8 +308,8 @@ export class ResolverWrapper {
     }
 
     // TODO! Add return type and params callbacks!
-    public resolve(p: Params): void {
-        this.resolveFunc(p)
+    public resolve(ctx: Context): void {
+        this.resolveFunc(ctx)
     }
 
     public returnType(): string {
@@ -301,9 +323,10 @@ export class ResolverWrapper {
 
 export function DeclareResolver<T extends Resolver>(): ResolverWrapper  {
     return new ResolverWrapper(
-        (p: Params) => {
+        (ctx: Context) => {
             const obj = instantiate<T>()
-            obj.resolve(p)
+            ctx.ptr = changetype<u32>(obj)
+            obj.resolve(ctx)
         },
         (): string => {
             const obj = instantiate<T>()

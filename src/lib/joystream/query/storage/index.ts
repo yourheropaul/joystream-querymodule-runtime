@@ -1,6 +1,6 @@
 /* tslint:disable:max-classes-per-file no-namespace */
 
-import { api, JSON } from ".."
+import { api, Context, JSON } from ".."
 
 function classify<T>(input: JSON): T {
     if (isInteger<T>()) {
@@ -24,18 +24,27 @@ export class Plain<T> {
         this.address = address
     }
 
-    public fetch( fn: (v: T) => void ): void {
-        api.callWrapper<T>(this.module, this.address, (j: JSON, fn1: api.callback<T>) => {
-            fn1(classify<T>(j))
-        }, fn)
+    public fetch(ctx: Context, fn: (ctx: Context, v: T) => void ): void {
+        api.callWrapper<T>(ctx,
+                           this.module, 
+                           this.address, 
+                           (ctx: Context, j: JSON, fn1: api.callback<T>) => {
+                                fn1(ctx, classify<T>(j))
+                           }, 
+                           fn)
     }
 }
 
 export class Map<K, T> extends Plain<T> {
-    public fetch( index: K, fn: (v: T) => void ): void {
-        api.callArgWrapper<T, K>(this.module, this.address, index, (j: JSON, fn1: api.callback<T>) => {
-            fn1(classify<T>(j))
-        }, fn)
+    public fetch( ctx: Context, index: K, fn: (ctx: Context, v: T) => void ): void {
+        api.callArgWrapper<T, K>(ctx,
+                                 this.module, 
+                                 this.address, 
+                                 index, 
+                                 (ctx: Context, j: JSON, fn1: api.callback<T>) => {
+                                    fn1(ctx, classify<T>(j))
+                                 }, 
+                                 fn)
     }
 
     public batch(): Batch<K, T> {
@@ -57,13 +66,15 @@ export class Batch<K, T> {
         this.keys.push(key)
     }
 
-    public fetch(fn: (v: T) => void): void {
+    public fetch(ctx: Context, fn: (ctx: Context, v: T) => void): void {
         api.callArgWrapperBatch<T, K>(
+            ctx,
             this.storage.module,
             this.storage.address,
             this.keys,
-            (j: JSON, fn1: api.callback<T>) => {
-                fn1(classify<T>(j))
-            }, fn)
+            (ctx: Context, j: JSON, fn1: api.callback<T>) => {
+                fn1(ctx, classify<T>(j))
+            }, 
+            fn)
     }
 }

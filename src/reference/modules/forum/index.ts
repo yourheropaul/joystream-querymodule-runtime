@@ -1,4 +1,4 @@
-import { Params, produce, Resolver } from "joystream/query"
+import { Context, produce, Resolver } from "joystream/query"
 import { Struct } from "joystream/query/codec"
 import { Map, Plain } from "joystream/query/storage"
 
@@ -18,15 +18,15 @@ export class CategoryList extends Resolver {
         super(["A"], "[Category]")
     }
 
-    public resolve(p: Params): void {
-        NextCategoryId.fetch((nextId: CategoryId) => {
+    public resolve(ctx: Context): void {
+        NextCategoryId.fetch(ctx, (ctx: Context, nextId: CategoryId) => {
             const batch = CategoryById.batch()
 
             for (let i: CategoryId = 1; i < nextId; i++) {
                 batch.add(i)
             }
 
-            batch.fetch((category: Category) => {
+            batch.fetch(ctx, (ctx: Context, category: Category) => {
                 produce.json(category.JSON)
             })
         })
