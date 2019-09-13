@@ -1,4 +1,4 @@
-import { Context, produce, Resolver } from "joystream/query"
+import { Context, Resolver } from "joystream/query"
 import { Struct } from "joystream/query/codec"
 import { Map, Plain } from "joystream/query/storage"
 
@@ -27,7 +27,7 @@ export class CategoryList extends Resolver {
             }
 
             batch.fetch(ctx, (ctx: Context, category: Category) => {
-                produce.json(category.JSON)
+                ctx.produce.json(category.JSON)
             })
         })
     }

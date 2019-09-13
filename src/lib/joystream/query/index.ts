@@ -96,6 +96,7 @@ export namespace glue {
         const c = new Context()
         c.id = changetype<u32>(c)
         c.params = params
+		c.produce = new ContexualYielder(c)
         return c
     }
 
@@ -221,46 +222,52 @@ declare namespace api {
 
 declare namespace response {
     @external("response", "pushString")
-    function pushString(value: string): void
+    function pushString(ctx: Context, value: string): void
 
     @external("response", "stringField")
-    function stringField(key: string, value: string): void
+    function stringField(ctx: Context, key: string, value: string): void
 
     @external("response", "numberField")
-    function numberField(key: string, value: u32): void
+    function numberField(ctx: Context, key: string, value: u32): void
 
     @external("response", "pushObject")
-    function pushObject(): void
+    function pushObject(ctx: Context): void
 
     @external("response", "popObject")
-    function popObject(): void
+    function popObject(ctx: Context): void
 }
 
-export namespace produce {
-    export function field(entry: TypedMap<string, JSON>, name: string): void {
+export class ContexualYielder {
+	context: Context
+	
+	constructor(context: Context) {
+		this.context = context
+	}
+
+    field(entry: TypedMap<string, JSON>, name: string): void {
         const record = entry.get(name)
 
         switch (record.kind) {
             case JSONValueKind.NUMBER:
-                response.numberField(name, record.toNumber())
+                response.numberField(this.context, name, record.toNumber())
                 break
 
             case JSONValueKind.STRING:
-                response.stringField(name, record.toString())
+                response.stringField(this.context, name, record.toString())
                 break
         }
     }
 
-    export function json(j: JSON): void {
+    json(j: JSON): void {
         // FIXME! Handle non-objects
         const record = j.toObject()
         const keys = record.keys()
 
-        response.pushObject()
+        response.pushObject(this.context)
         for (let i: i32 = 0; i < keys.length; i++) {
-            produce.field(record, keys[i])
+            this.field(record, keys[i])
         }
-        response.popObject()
+        response.popObject(this.context)
     }
 }
 
@@ -275,6 +282,7 @@ export class Context {
     id: u32
     params: Params
     ptr: u32
+	produce: ContexualYielder
 
     as<T>(): T {
         return changetype<T>(this.ptr)
