@@ -41,7 +41,7 @@ export class TypedMap<K, V> {
 
     public getEntry(key: K): TypedMapEntry<K, V> | null {
         for (let i: i32 = 0; i < this.entries.length; i++) {
-            if (this.entries[i].key === key) {
+            if (this.entries[i].key == key) {
                 return this.entries[i]
             }
         }
@@ -50,7 +50,7 @@ export class TypedMap<K, V> {
 
     public get(key: K): V | null {
         for (let i: i32 = 0; i < this.entries.length; i++) {
-            if (this.entries[i].key === key) {
+            if (this.entries[i].key == key) {
                 return this.entries[i].value
             }
         }
@@ -59,7 +59,7 @@ export class TypedMap<K, V> {
 
     public isSet(key: K): bool {
         for (let i: i32 = 0; i < this.entries.length; i++) {
-            if (this.entries[i].key === key) {
+            if (this.entries[i].key == key) {
                 return true
             }
         }
@@ -92,13 +92,17 @@ export namespace glue {
         return r.SDLType
     }
 
-    export function NewContext(params: Params): Context {
+    export function NewContext(p: Params): Context {
         const c = new Context()
         c.id = changetype<u32>(c)
-        c.params = params
+		c.params = p
 		c.produce = new ContexualYielder(c)
         return c
     }
+
+	export function SetContextParams(c: Context, p: Params): void {
+		c.params = p
+	}
 
     export function ResolveQuery(w: ResolverWrapper, c: Context): void {
         w.resolve(c)
@@ -168,6 +172,19 @@ export class JSON {
     public toString(): string {
         assert(this.kind === JSONValueKind.STRING, "JSON value is not a string.")
         return changetype<string>(this.value as u32)
+    }
+}
+
+export function classify<T>(input: JSON): T {
+    if (isInteger<T>()) {
+        return input.toNumber()
+    } else if (isSigned<T>()) {
+        return input.toI32()
+    } else if (isString<T>()) {
+        return input.toString()
+    } else {
+        // Assume an object
+        return instantiate<T>(input)
     }
 }
 
@@ -287,6 +304,12 @@ export class Context {
     as<T>(): T {
         return changetype<T>(this.ptr)
     }
+
+	param<T>(name: string): T {
+		const value = this.params.get(name)
+        assert(value !== null, "Unexpected null param.")
+		return classify<T>(value as JSON)
+	}
 }
 
 export class Resolver {

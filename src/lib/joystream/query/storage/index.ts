@@ -1,19 +1,6 @@
 /* tslint:disable:max-classes-per-file no-namespace */
 
-import { api, Context, JSON } from ".."
-
-function classify<T>(input: JSON): T {
-    if (isInteger<T>()) {
-        return input.toNumber()
-    } else if (isSigned<T>()) {
-        return input.toI32()
-    } else if (isString<T>()) {
-        return input.toString()
-    } else {
-        // Assume an object
-        return instantiate<T>(input)
-    }
-}
+import { api, classify, Context, JSON } from ".."
 
 export class Plain<T> {
     public module: string

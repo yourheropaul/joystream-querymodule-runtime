@@ -15,14 +15,14 @@ export const CategoryById = new Map<CategoryId, Category>("forum", "CategoryById
 
 export class CategoryList extends Resolver {
     constructor() {
-        super(["A"], "[Category]")
+        super(["start: Int = 1"], "[Category]")
     }
 
     public resolve(ctx: Context): void {
         NextCategoryId.fetch(ctx, (ctx: Context, nextId: CategoryId) => {
             const batch = CategoryById.batch()
 
-            for (let i: CategoryId = 1; i < nextId; i++) {
+            for (let i: CategoryId = ctx.param<CategoryId>("start"); i < nextId; i++) {
                 batch.add(i)
             }
 
