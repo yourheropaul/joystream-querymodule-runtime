@@ -96,7 +96,7 @@ export namespace glue {
         const c = new Context()
         c.id = changetype<u32>(c)
 		c.params = p
-		c.produce = new ContexualYielder(c)
+		c.produce = new ContextualYielder(c)
         return c
     }
 
@@ -254,11 +254,13 @@ declare namespace response {
     function popObject(ctx: Context): void
 }
 
-export class ContexualYielder {
+export class ContextualYielder {
 	context: Context
+	//filters: Array<FilterFunc>
 	
 	constructor(context: Context) {
 		this.context = context
+        //this.filters = new Array<FilterFunc>(0)
 	}
 
     field(entry: TypedMap<string, JSON>, name: string): void {
@@ -299,7 +301,7 @@ export class Context {
     id: u32
     params: Params
     ptr: u32
-	produce: ContexualYielder
+	produce: ContextualYielder
 
     as<T>(): T {
         return changetype<T>(this.ptr)
@@ -322,6 +324,62 @@ export class Resolver {
     }
 
     public resolve(ctx: Context): void {}
+}
+
+export enum FilterMode {
+	Include = 1,
+	Exclude = 2
+}
+
+export class Filter<T> {
+	fieldAddress: string
+	value: T
+	mode: FilterMode
+
+	constructor(fieldAddress: string, value: T, mode:FilterMode = FilterMode.Include) {
+		this.fieldAddress = fieldAddress
+		this.value = value
+		this.mode = mode
+	}
+
+	filter(ctx: Context, raw: JSON): FilterMode {
+		// FIXME: We're assuming JSON is an object here
+		const j = raw.toObject()
+
+		// TODO: Complex addresses: x.y.z
+		if (!j.isSet(this.fieldAddress)) {
+			return FilterMode.Exclude
+		}
+
+		const field = j.get(this.fieldAddress) as T
+		const value:T = classify<T>(field as JSON)
+
+		if (value == this.value) {
+			return this.mode
+		}
+
+		return FilterMode.Exclude
+	}
+
+	apply(ctx: Context, j: JSON): void {
+		const result = this.filter(ctx,j)
+		if (result == FilterMode.Include) {
+			ctx.produce.json(j)
+		}
+	}
+}
+
+export class FieldFilter<T> {
+	fieldName: string
+
+	constructor(fieldName: string) {
+		this.fieldName = fieldName
+	}
+
+	apply(ctx: Context, value: T, j: JSON,  mode:FilterMode = FilterMode.Include): void {
+		const f = new Filter<T>(this.fieldName, value,  mode) 
+		f.apply(ctx, j)
+	}
 }
 
 // ResolverWrapper uses some gymnastics to get around the lack of interfaces.

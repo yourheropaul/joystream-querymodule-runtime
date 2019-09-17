@@ -1,5 +1,5 @@
 import { DeclareResolver, glue } from "joystream/query"
-import { Category as CategoryType, CategoryList } from "./modules/forum"
+import { Category, Thread, CategoryList, ThreadList } from "./modules/forum"
 
 export {
     glue,
@@ -8,10 +8,12 @@ export {
 // tslint:disable-next-line:no-namespace
 export namespace types {
     export const CategoryId = "u32"
-    export const Category = CategoryType.Codec()
+    export const Category = Category.Codec()
+    export const Thread = Thread.Codec()
 }
 
 // tslint:disable-next-line:no-namespace
 export namespace resolvers {
     export const forumCategories = DeclareResolver<CategoryList>()
+    export const forumThreads = DeclareResolver<ThreadList>()
 }
